@@ -1,0 +1,11 @@
+/* CSS declarations go here */
+
+.container-narrow {
+    margin: auto;
+    width: 700px;
+}
+
+.row {
+    margin-bottom: 20px;
+}
+

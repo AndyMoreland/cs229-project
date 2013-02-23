@@ -1,0 +1,86 @@
+\documentclass[11pt,twocolumn]{scrartcl}
+\usepackage{amsmath}
+% \usepackage{fullpage}
+\usepackage[top=1in, bottom=1in, left=0.8in, right=1in]{geometry}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{wrapfig}
+\usepackage{mathtools}
+\usepackage{parskip}
+
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\ind}[1]{^{(#1)}}
+
+
+\setlength{\columnsep}{1.1pc}
+
+\title{The Perfect IHUM Essay?}
+\subtitle{Predicting IHUM Essay Grades}
+\author{Andrew Moreland \\ Charlie Guo}
+\date{}
+\begin{document}
+
+\maketitle
+
+\vspace{-0.3in}
+\rule{\linewidth}{0.4pt}
+\setlength{\parskip}{10pt plus 1pt minus 1pt}
+
+\section{Introduction}
+Our project is attempting to use various features of writing and diction in order to predict the final grade given to an essay written for an IHUM class. Nearly everyone has taken an IHUM class, giving us a wide corpus to draw from, but because IHUM classes have been replaced beginning with the class of 2016, there is little worry that this project will be used to violate the Honor Code in any way. That having been said, there are a number of useful extensions of this application, with areas like general essay grade prediction, news article relevance or ratings, and honors thesis scores. 
+
+\section{Background}
+
+Automated essay scoring has been around for some time now, with approaches and use cases becoming more varied with time. Some of the original systems were developed in the 1960's, at the request of the College Board \footnote{Dikli, S. (2006). An Overview of Automated Scoring of Essays. Journal of Technology, Learning, and Assessment, 5(1).}. One of these systems, Project Essay Grader (PEG), used simple features of the written essays in order to determine a relative "score" (while these features were labeled ahead of time, PEG did not use machine learning to analyze the input features). While PEG was somewhat effective, its weighting of certain features allowed it to be "tricked" by doing things like writing longer essays. The problem was that PEG did not analyze the semantics of the essays; instead, it only analyzed the structure.
+
+More recently, however, other systems such as Intelligent Essay Assesor (IEA), use more sophisticated techniques to predict scores. One of these techniques is Latent Semantic Analysis (LSA), “a statistical model of word usage that permits comparisons of the semantic similarity between pieces of textual information.” Along with IEA, other programs like Criterion and E-rater used other Natural Language Processing (NLP) techniques to generate essay scores, which proved more effective than the initial LSA approach. Our project will at first attempt to replicate the features of PEG, and then if possible include some of the strategies used by IEA. However, due to our lack of experience in the field of NLP, it will likely be difficult to produce an algorithm which effectively analyzes the semantic meaning of our essays. 
+
+\section{Data Collection}
+
+Although nearly every student in recent years who has passed through Stanford has taken an IHUM course, we were still faced with the problem of sourcing the essays. To facilitate this, we created a site (http://ihumessayproject.com/) which allowed students to easily upload their previous IHUM essays, along with the grade that they received. After a cursory, high-level look at a number of essays, general structure patterns began to emerge. Notably, most essays had roughly the same format, with an introductory paragraph, 2-3 body paragraphs, and a concluding paragraph. 
+
+So far, we have generated $121$ essays through the site, and we will be using $85$ for training and $36$ for testing in order to select parameters for our models according to a standard $70\%$ cross-validation scheme. It is likely that we will continue to receive an extra essay here and there, and in that case we will add them to our training and validation sets at the same $70-30$ ratio. Depending on the running times of our training, we may experiment with smaller testing sizes, but we will start with this setup.
+
+\section{Pre-Processing}
+In order to get a better idea of our training set, we will do pre-processing on the essays in order to extract the following features:
+
+\begin{enumerate}
+  \item Essay length
+  \item Paragraph length
+  \item Number of quotations
+  \item Length of quotations
+  \item Average word length
+  \item Average grade level of word
+  \item Word frequency (using a Porter Stemmer)
+  \item Part of speech frequency (using a standard part of speech tagger, such as the Natural Language Toolkit for Python \footnote{http://nltk.org/})
+  \item Misspelled words (words very close to words in the dictionary according to edit distance)
+\end{enumerate}
+
+In addition to extracting these features, we will clean the data by removing things like stop words \footnote{http://www.lextek.com/manuals/onix/stopwords1.html} and peoples' names. In this phase, we will also tokenize the corpus into word counts in order to make it easier to run algorithms like Naive Bayes for classification.
+
+
+\section{Classification}
+
+\subsection{Algorithm 1: Multinomial Naive Bayes}
+We would like to use the standard Multinomial Naive Bayes algorithm in order to predict the grade of essays. The problem is that we have multiple classes -- essays can receive more than $2$ grades. In order to solve this problem, we will try the ``All-Vs-One'' strategy, where we train a classifier for each class versus all of the other classes. We will assign each essay the grade that comes from the most confident classifier.
+
+It would also be interesting to see if there are certain words that are particularly predictive of an essay's grade. In order to determine this, we will experiement with forward and reverse search among the words in order to train classifiers on reduced feature sets. Two heuristics for dropping features come to mind immediately: we will try adding/removing the most common non-stop words, and we will try adding/removing the least common non-stop words in our searches.
+
+\subsection{Algorithm 2: SMO w/ SVMs}
+We will try using LIBSVM \footnote{http://www.csie.ntu.edu.tw/~cjlin/libsvm/} in order to train on the statistics we generate during the pre-processing phase. Our hope is that some of these higher-level structural statistics will serve as useful indicators of essay quality. We will experiment with using SVMs with different kernels -- linear and polynomial to start, and we will use forward search with $70-30$ cross-validation in order to select the most useful features to train our SVM on.
+
+\subsection{Combination}
+We will combine the outputs of the aforementioned algorithms and tune the relative weightings of them in order to generate our final analysis of an essay. 
+
+\section{Next Steps}
+After we implement these algorithms (over Thanksgiving, probably) we will evaluate our accuracy. If we find that our accuracy is not satisfactory (ideally we'd like something in the $90\%+$ range), we will work on troubleshooting these algorithms. Once we are satisfied with the performance of these basic algorithms, we will look into implementing more complex semantic analysis in order to improve performance.
+
+Overall, once we have created a classifier which we are satisfied with, we will send out an email to all of our contributors that will refer them to an online interface akin to the submission interface which will allow them to submit new essays and have them graded automatically. By the time that we are done, the new Freshman class will also have received several essays back with grades. We will encourage them to run our classifier on their essays and let us know how it does.
+    
+\end{document}

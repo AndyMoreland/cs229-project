@@ -1,0 +1,108 @@
+<head>
+  <title>IHUM Essay Upload</title>
+  <script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
+  <script type="text/javascript">
+    filepicker.setKey('ApBgRse9VSlyt1ts1U4bIz');
+  </script>
+
+</head>
+
+<body>
+  <div class = "container-narrow">
+    <div class="row">
+      <div class="span9">
+        <h1 class = "huge">Upload Your Old IHUM Essays</h1>
+        <div class = "login">
+          <div class = "row">
+            <div class = "span4">
+              <h3>About This</h3>
+              <p>
+                This is part of a CS229 project by Charlie Guo and Andy Moreland.
+              </p>
+              <p>
+                The goal of our project is to develop an algorithm that can automatically grade IHUM essays.
+              </p>
+              <p>
+                In order to accomplish this, we need the essays and grades of past IHUM students.
+              </p>
+            </div>
+            <div class = "span4">
+              <h3>How to Help</h3>
+              <p>
+                Simply enter your email below and click the green button.
+              </p>
+              <p>
+                On the next screen, upload your essays and enter the grades that you received alongside the corresponding essay.
+              </p>
+              <p>
+                We will not store any personally identifying information from the documents, but feel free to remove your name before submitting.
+              </p>
+            </div>
+          </div>
+            <form>
+              <label for = "email"><strong>Enter your email here:</strong></label>
+              <input type = "text" name = "email" placeholder = "example@example.org"></text>
+              <input type = "submit" name = "sign-in" class = "btn btn-success" value = "Sign Up/In">
+            </form>
+        </div>
+        <div class = "files" style = "display:none;">
+          <div class = "row"> 
+            <div class = "span3">
+              <h3>Step 1.</h3>
+              Click <strong>"Upload New Essay"</strong>
+            </div>
+            <div class = "span3">
+              <h3>Step 2.</h3>
+              Select essay from your computer, or from other services you may use
+            </div> 
+
+            <div class = "span3">
+              <h3> Step 3.</h3>
+              Choose grade, and repeat. If you are unsure, select your best guess.
+            </div>
+          </div>
+          <table class = 'table table-bordered'>
+            <thead>
+              <tr><th>File Name</th><th>Grade</th></tr>
+            </thead>
+            <tbody>
+              {{> uploadedFiles}}
+            </tbody>
+          </table>
+          <div> {{> buttons}}</div>
+          <div id = "thanks"></div>
+
+        </div>
+      </div>
+    </div>
+  <div class = 'footer'>
+    Please email <a href = "mailto:andymo@stanford.edu">andymo@stanford.edu</a> with any questions.
+  </div>
+  </div>
+</body>
+
+<template name="uploadedFiles">
+  {{#each files}}
+    <tr>
+      <td> {{ filename }} </td>
+      <td>
+        <select name = 'grade'> 
+          <option disabled = 'disabled'> ---- </option>
+
+          {{#each grades}}
+            <option {{#if selected}} selected = 'selected' {{/if}} value = '{{grade}}'>{{grade}}</option>
+          {{/each}}
+        </select> 
+        </td>
+    </tr>
+  {{/each}}
+</template>
+
+<template name="buttons">
+  <button name = "upload-file" type = "filepicker" class = 'btn btn-primary'>Upload New Essay</button>
+</template>
+
+
+<template name = "thanks">
+  <h2> Thanks! </h2>
+</template>
